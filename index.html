@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle Financeiro Premium</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
+</head>
+
+<body>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js')
+                .then(() => console.log('Service Worker Registered'))
+                .catch((err) => console.log('Service Worker Failed', err));
+        }
+    </script>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <!-- Login Screen -->
+    <section id="login-screen">
+        <div class="login-card glass-panel">
+            <div class="login-header">
+                <i class="fa-solid fa-wallet logo-icon"></i>
+                <h2>Financeiro</h2>
+                <p>Controle de Gastos</p>
+            </div>
+            <form id="login-form">
+                <div class="input-group">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="login-password" placeholder="Senha de Acesso" required>
+                </div>
+                <button type="submit" class="login-btn">
+                    Entrar <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Main Application (Hidden by default) -->
+    <div id="app-container" style="display: none;">
+        <header>
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fa-solid fa-wallet"></i>
+                    <h1>Finance<span class="highlight">Control</span></h1>
+                </div>
+                <div class="user-profile">
+                    <img src="https://ui-avatars.com/api/?name=Caio+Kamilla&background=random" alt="User" class="avatar"
+                        id="user-avatar">
+                    <div class="dropdown-menu" id="user-dropdown">
+                        <button id="logout-btn">
+                            <i class="fa-solid fa-right-from-bracket"></i> Sair
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <!-- Month Navigation -->
+            <div class="month-navigation">
+                <button id="prev-month" class="nav-btn"><i class="fa-solid fa-chevron-left"></i></button>
+                <h2 id="current-month-display">Mês Atual</h2>
+                <button id="next-month" class="nav-btn"><i class="fa-solid fa-chevron-right"></i></button>
+                <button id="print-btn" class="nav-btn print-btn" title="Imprimir Relatório"><i
+                        class="fa-solid fa-print"></i></button>
+            </div>
+
+            <!-- Dashboard Section -->
+            <section class="dashboard">
+                <!-- Income Card -->
+                <div class="card income-card">
+                    <div class="card-header">
+                        <h3>Rendas</h3>
+                        <i class="fa-solid fa-circle-arrow-up icon"></i>
+                    </div>
+                    <div class="income-inputs">
+                        <div class="income-field">
+                            <label>Caio</label>
+                            <div class="input-group-income small">
+                                <span>R$</span>
+                                <input type="number" id="income-caio" placeholder="0" value="0" onfocus="this.select()">
+                            </div>
+                        </div>
+                        <div class="income-field">
+                            <label>Kamilla</label>
+                            <div class="input-group-income small">
+                                <span>R$</span>
+                                <input type="number" id="income-kamilla" placeholder="0" value="0"
+                                    onfocus="this.select()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Expenses Summary -->
+                <div class="card expense-card">
+                    <div class="card-header">
+                        <h3>Gastos (Total)</h3>
+                        <i class="fa-solid fa-circle-arrow-down icon"></i>
+                    </div>
+                    <div class="value-display">
+                        <span id="total-expenses">R$ 0,00</span>
+                    </div>
+                    <div class="mini-stats">
+                        <div class="stat">Caio: <span id="expense-caio">R$ 0,00</span></div>
+                        <div class="stat">Kamilla: <span id="expense-kamilla">R$ 0,00</span></div>
+                    </div>
+                </div>
+
+                <!-- Debit Expenses Card -->
+                <div class="card debit-card">
+                    <div class="card-header">
+                        <h3>Gastos (Débito)</h3>
+                        <i class="fa-solid fa-money-bill-1 icon" style="color: #38bdf8;"></i>
+                    </div>
+                    <div class="value-display">
+                        <span id="total-debit" style="color: #38bdf8;">R$ 0,00</span>
+                    </div>
+                </div>
+
+                <!-- Credit Expenses Card -->
+                <div class="card credit-card">
+                    <div class="card-header">
+                        <h3>Gastos (Crédito)</h3>
+                        <i class="fa-solid fa-credit-card icon" style="color: #f472b6;"></i>
+                    </div>
+                    <div class="value-display">
+                        <span id="total-credit" style="color: #f472b6;">R$ 0,00</span>
+                    </div>
+                </div>
+
+                <!-- Balance Card -->
+                <div class="card balance-card">
+                    <div class="card-header">
+                        <h3>Saldos</h3>
+                        <i class="fa-solid fa-scale-balanced icon"></i>
+                    </div>
+                    <div class="balance-grid">
+                        <div class="balance-item">
+                            <span class="b-label">Caio</span>
+                            <span class="b-value" id="balance-caio">R$ 0,00</span>
+                        </div>
+                        <div class="balance-item">
+                            <span class="b-label">Kamilla</span>
+                            <span class="b-value" id="balance-kamilla">R$ 0,00</span>
+                        </div>
+                    </div>
+                    <div class="total-balance-row">
+                        <span>Total: </span>
+                        <span id="balance-total">R$ 0,00</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Content Area -->
+            <div class="content-grid">
+                <!-- Add Transaction Form -->
+                <section class="transaction-form glass-panel">
+                    <h2>Nova Despesa</h2>
+                    <form id="expense-form">
+                        <div class="form-group">
+                            <label for="desc">Descrição</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-tag"></i>
+                                <input type="text" id="desc" placeholder="Ex: Conta de Luz" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="amount">Valor (R$)</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-dollar-sign"></i>
+                                    <input type="number" id="amount" placeholder="0.00" step="0.01" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="date">Vencimento</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-calendar"></i>
+                                    <input type="date" id="date" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group toggle-group">
+                            <label class="toggle-label">
+                                <i class="fa-solid fa-user-group"></i> Dividir conta por 2?
+                            </label>
+                            <label class="switch">
+                                <input type="checkbox" id="split-expense" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <!-- Owner Selection (Hidden if Split is checked) -->
+                        <div class="form-group" id="owner-selection" style="display: none;">
+                            <label>Quem paga?</label>
+                            <div class="category-selector">
+                                <input type="radio" name="owner" id="owner-caio" value="Caio">
+                                <label for="owner-caio" class="cat-btn owner-btn">
+                                    <i class="fa-solid fa-user"></i> Caio
+                                </label>
+
+                                <input type="radio" name="owner" id="owner-kamilla" value="Kamilla">
+                                <label for="owner-kamilla" class="cat-btn owner-btn">
+                                    <i class="fa-solid fa-user-dress"></i> Kamilla
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Categoria</label>
+                            <div class="category-selector">
+                                <input type="radio" name="category" id="cat-fixa" value="fixa" checked>
+                                <label for="cat-fixa" class="cat-btn" data-cat="fixa">
+                                    <i class="fa-solid fa-house"></i> Fixa
+                                </label>
+
+                                <input type="radio" name="category" id="cat-lazer" value="lazer">
+                                <label for="cat-lazer" class="cat-btn" data-cat="lazer">
+                                    <i class="fa-solid fa-umbrella-beach"></i> Lazer
+                                </label>
+
+                                <input type="radio" name="category" id="cat-obra" value="obra">
+                                <label for="cat-obra" class="cat-btn" data-cat="obra">
+                                    <i class="fa-solid fa-hammer"></i> Obra
+                                </label>
+
+                                <input type="radio" name="category" id="cat-outros" value="outros">
+                                <label for="cat-outros" class="cat-btn" data-cat="outros">
+                                    <i class="fa-solid fa-box-open"></i> Outros
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Pagamento</label>
+                            <div class="category-selector">
+                                <input type="radio" name="payment" id="pay-debit" value="debito" checked>
+                                <label for="pay-debit" class="cat-btn pay-btn">
+                                    <i class="fa-solid fa-money-bill-1"></i> Débito
+                                </label>
+
+                                <input type="radio" name="payment" id="pay-credit" value="credito">
+                                <label for="pay-credit" class="cat-btn pay-btn">
+                                    <i class="fa-solid fa-credit-card"></i> Crédito
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="submit-btn">
+                            <i class="fa-solid fa-plus"></i> Adicionar Despesa
+                        </button>
+                    </form>
+                </section>
+
+                <!-- Transactions List -->
+                <section class="transaction-history glass-panel">
+                    <div class="history-header">
+                        <h2>Histórico de Gastos</h2>
+                        <div class="filter-tabs" id="filter-tabs">
+                            <button class="filter-btn active" data-filter="all">Todos</button>
+                            <button class="filter-btn" data-filter="owner:Caio">Caio</button>
+                            <button class="filter-btn" data-filter="owner:Kamilla">Kamilla</button>
+                            <br> <!-- Line break for categories -->
+                            <button class="filter-btn" data-filter="fixa">Fixa</button>
+                            <button class="filter-btn" data-filter="lazer">Lazer</button>
+                            <button class="filter-btn" data-filter="obra">Obra</button>
+                            <button class="filter-btn" data-filter="outros">Outros</button>
+                        </div>
+                    </div>
+
+                    <div class="transactions-container">
+                        <div class="table-header">
+                            <div class="th th-desc">Descrição</div>
+                            <div class="th th-caio">Caio</div>
+                            <div class="th th-kamila">Kamilla</div>
+                            <div class="th th-action"></div>
+                        </div>
+                        <ul id="transactions-list" class="transactions-list">
+                            <!-- Items will be injected here by JS -->
+                        </ul>
+                        <div id="empty-state" class="empty-state">
+                            <i class="fa-solid fa-receipt"></i>
+                            <p>Nenhuma despesa registrada.</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Sistema Financeiro Caio & Kamilla. Desenvolvido por Caio César Cardoso <i
+                    class="fa-solid fa-heart" style="color: var(--color-expense);"></i></p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
