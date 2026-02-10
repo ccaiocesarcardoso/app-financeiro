@@ -56,10 +56,21 @@
                     <i class="fa-solid fa-wallet"></i>
                     <h1>Finance<span class="highlight">Control</span></h1>
                 </div>
+                <button id="install-app-btn" class="install-btn" style="display: none;">
+                    <i class="fa-solid fa-download"></i> Instalar App
+                </button>
                 <div class="user-profile">
                     <img src="https://ui-avatars.com/api/?name=Caio+Kamilla&background=random" alt="User" class="avatar"
                         id="user-avatar">
                     <div class="dropdown-menu" id="user-dropdown">
+                        <button id="backup-btn">
+                            <i class="fa-solid fa-cloud-arrow-down"></i> Backup Dados
+                        </button>
+                        <button id="restore-btn" onclick="document.getElementById('restore-file').click()">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Restaurar Dados
+                        </button>
+                        <input type="file" id="restore-file" style="display: none;" accept=".json">
+                        <hr>
                         <button id="logout-btn">
                             <i class="fa-solid fa-right-from-bracket"></i> Sair
                         </button>

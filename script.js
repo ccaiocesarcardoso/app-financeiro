@@ -445,6 +445,80 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- PWA INSTALLATION LOGIC ---
+    let deferredPrompt;
+    const installBtn = document.getElementById('install-app-btn');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevent Chrome 67 and earlier from automatically showing the prompt
+        e.preventDefault();
+        // Stash the event so it can be triggered later.
+        deferredPrompt = e;
+        // Update UI to notify the user they can add to home screen
+        installBtn.style.display = 'flex';
+    });
+
+    installBtn.addEventListener('click', (e) => {
+        // Hide our user interface that shows our A2HS button
+        installBtn.style.display = 'none';
+        // Show the prompt
+        deferredPrompt.prompt();
+        // Wait for the user to respond to the prompt
+        deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+                console.log('User accepted the A2HS prompt');
+            } else {
+                console.log('User dismissed the A2HS prompt');
+            }
+            deferredPrompt = null;
+        });
+    });
+
+    // --- DATA BACKUP & RESTORE ---
+    const backupBtn = document.getElementById('backup-btn');
+    const restoreFile = document.getElementById('restore-file');
+
+    backupBtn.addEventListener('click', () => {
+        const data = {
+            monthlyIncomeData,
+            expenses
+        };
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", "financeiro_backup_" + new Date().toISOString().slice(0, 10) + ".json");
+        document.body.appendChild(downloadAnchorNode); // required for firefox
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+        alert('Backup realizado com sucesso! O arquivo foi baixado.');
+    });
+
+    restoreFile.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                const data = JSON.parse(event.target.result);
+                if (data.monthlyIncomeData && data.expenses) {
+                    if (confirm('Isso irá substituir TODOS os dados atuais pelos do backup. Deseja continuar?')) {
+                        localStorage.setItem('fin_monthly_income', JSON.stringify(data.monthlyIncomeData));
+                        localStorage.setItem('fin_expenses', JSON.stringify(data.expenses));
+                        alert('Dados restaurados com sucesso! A página será recarregada.');
+                        location.reload();
+                    }
+                } else {
+                    alert('Arquivo de backup inválido.');
+                }
+            } catch (err) {
+                alert('Erro ao ler o arquivo de backup.');
+                console.error(err);
+            }
+        };
+        reader.readAsText(file);
+    });
+
     // Initialize
     loadData();
 });
